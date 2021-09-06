@@ -21,10 +21,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class FormController extends Controller
 {
     /**
-     * @param Request $request
      * @return Response
      */
-    public function form(Request $request): Response
+    public function form(): Response
     {
         return new Response($this->render('form.html.twig'), Response::HTTP_OK, [ 'Content-Type' => 'text/html' ]);
     }
