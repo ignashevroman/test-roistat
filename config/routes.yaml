@@ -1,0 +1,18 @@
+home:
+    path: /
+    controller: App\Controller\FormController::form
+
+process_form:
+    path: form
+    controller: App\Controller\FormController::process
+    methods: POST
+
+oauth_redirect:
+    path: oauth/redirect
+    controller: App\Controller\OAuthController::redirect
+    methods: GET
+
+oauth_callback:
+    path: oauth/callback
+    controller: App\Controller\OAuthController::callback
+    methods: GET

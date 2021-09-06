@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Roistat Test Task</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.6/dist/inputmask.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <main class="container">
+            <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
+                <form id="form" class="form d-flex flex-column gap-4">
+                    <div id="error" class="alert alert-danger visually-hidden" role="alert"></div>
+                    <div id="success" class="alert alert-success visually-hidden" role="alert">Форма отправлена</div>
+
+                    <div class="form-group">
+                        <label for="name" class="form-label">Имя</label>
+                        <input id="name" type="text" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Номер телефона</label>
+                        <input id="phone" type="tel" name="phone" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">E-Mail</label>
+                        <input id="email" type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price" class="form-label">Цена</label>
+                        <input id="price" type="text" name="price" class="form-control" required>
+                    </div>
+
+                    <button id="submit" type="submit" class="btn btn-dark">Отправить</button>
+                </form>
+            </div>
+        </main>
+
+        <script>
+            // Form
+            const form = document.querySelector('#form');
+
+            // Create phone number mask
+            const phoneMask = new Inputmask({ mask: '+7 (999) 999-9999', clearMaskOnLostFocus: false });
+            phoneMask.mask(document.querySelector('#phone'));
+
+            // Error and success alerts
+            const error = document.querySelector('#error'),
+                success = document.querySelector('#success');
+
+            // Form processor
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+
+                if (form.classList.contains('disabled')) {
+                    return;
+                }
+
+                // Serialize form
+                const formData = new FormData(event.target),
+                    data = {};
+                for (let key of formData.keys()) {
+                    data[key] = formData.get(key);
+                }
+
+                // Hide alerts
+                error.innerHTML = '';
+                error.classList.add('visually-hidden');
+                success.classList.add('visually-hidden');
+
+                // Disable before send
+                disableForm(form);
+
+                // Send form
+                fetch('/form', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        accept: 'application/json',
+                        'content-type': 'application/json'
+                    }
+                }).then((response) => {
+                    enableForm(form);
+
+                    if (response.ok) {
+                        success.classList.remove('visually-hidden');
+                        return;
+                    }
+
+                    response.json().then((data) => {
+                        showError(data.message);
+                    });
+                }).catch((error) => {
+                    enableForm(form);
+                    showError(error)
+                });
+            });
+
+            function showError(message) {
+                error.innerHTML = message;
+                error.classList.remove('visually-hidden');
+            }
+
+            function disableForm(form) {
+                form.classList.add('disabled');
+                form.querySelector('button#submit').disabled = true;
+            }
+
+            function enableForm(form) {
+                form.classList.remove('disabled');
+                form.querySelector('button#submit').disabled = false;
+            }
+        </script>
+    </body>
+</html>
